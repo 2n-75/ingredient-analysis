@@ -1,4 +1,4 @@
-import { AnchorHTMLAttributes, ButtonHTMLAttributes, FC, MouseEventHandler } from 'react'
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, FC } from 'react'
 import { css } from '@emotion/css'
 import { Colors } from '@/styles/colors'
 
@@ -27,7 +27,7 @@ const styles = {
     text-align: center;
     transition: all 0.2s;
     &:hover {
-      background: ${Colors.link};
+      background: ${Colors.secondary};
     }
   `,
 }

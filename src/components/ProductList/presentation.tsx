@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { css } from '@emotion/css'
 import { Colors } from '../../styles/colors'
-import { Product } from '../App'
 import { Checkbox } from '../Checkbox'
 
 export type Props = {
@@ -39,17 +38,19 @@ const Presentation: FC<Props> = ({ products, commonIngredients, enableHighlight,
                 <div>{product.name}</div>
               </td>
               <td className={styles.contentCell}>
-                {product.ingredients.map(ingredient => (
-                  <>
-                    {enableHighlight && commonIngredients.includes(ingredient) ? (
-                      <>
-                        <span className={styles.highlight}>{ingredient}</span> ,
-                      </>
-                    ) : (
-                      <>{ingredient} ,</>
-                    )}
-                  </>
-                ))}
+                <p>
+                  {product.ingredients.map(ingredient => (
+                    <>
+                      {enableHighlight && commonIngredients.includes(ingredient) ? (
+                        <>
+                          <span className={styles.highlight}>{ingredient}</span> ,
+                        </>
+                      ) : (
+                        <>{ingredient} ,</>
+                      )}
+                    </>
+                  ))}
+                </p>
               </td>
               <td className={styles.contentCell}>
                 <a href={product.url} target="_blank" className={styles.link} rel="noreferrer">
@@ -113,7 +114,7 @@ const styles = {
     text-align: center;
     transition: all 0.2s;
     &:hover {
-      background: ${Colors.link};
+      background: ${Colors.secondary};
     }
   `,
   linkTextWrapper: css`

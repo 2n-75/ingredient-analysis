@@ -52,6 +52,7 @@ const styles = {
     min-width: 350px;
     max-width: 960px;
     margin: 0 auto;
+    padding: 10px 20px;
   `,
   formWrapper: css`
     margin-top: 20px;

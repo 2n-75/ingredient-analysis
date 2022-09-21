@@ -8,7 +8,16 @@
     "serve": "npm run build && firebase emulators:start --only functions,hosting",
     "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy --only functions,hosting",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "prettier": "prettier \"*.{md,js,json,yml}\" \"src/**/*\"",
+    "format": "npm run prettier -- --write",
+    "check:format": "npm run prettier -- --check",
+    "eslint": "next lint --max-warnings=0",
+    "eslint:fix": "npm run eslint -- --fix",
+    "stylelint": "stylelint \"**/*.{css,scss,ts,tsx}\" --ignore-path .gitignore --max-warnings=0",
+    "stylelint:fix": "npm run stylelint -- --fix",
+    "lint": "npm run check:format && npm run eslint && npm run stylelint",
+    "lint:fix": "npm run format && npm run eslint:fix && npm run stylelint:fix"
   },
   "dependencies": {
     "@emotion/css": "^11.9.0",

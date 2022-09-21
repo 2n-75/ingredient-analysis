@@ -15,21 +15,21 @@ export const ProductList: FC<Props> = ({ products }) => {
     [products]
   )
 
-  const commonElements = useMemo(() => {
-    /**
-     * ハイライトするために共通の成分を探す
-     * 共通要素を返す
-     */
-    return []
-  }, [])
-
+  /**
+   * ハイライトするために共通の成分を探す
+   * 共通要素を返す
+   */
+  const commonIngredients = useMemo(() => {
+    return formattedProducts[0].ingredients.filter(ingredient => formattedProducts[1].ingredients.includes(ingredient))
+  }, [formattedProducts])
+  console.log({ 共通要素: commonIngredients })
   if (products.length === 0) {
     return <p>商品情報が存在しません</p>
   }
   return (
     <Presentation
       products={formattedProducts}
-      commonIngredients={[]}
+      commonIngredients={commonIngredients}
       enableHighlight={enableHighlight}
       handleHighlight={() => setEnableHighlight(!enableHighlight)}
     />

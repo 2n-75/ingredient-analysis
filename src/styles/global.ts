@@ -20,7 +20,7 @@ injectGlobal`
   body {
     color: ${Colors.black};
     a {
-      color: ${Colors.link};
+      color: ${Colors.secondary};
     }
 
     a, button {
