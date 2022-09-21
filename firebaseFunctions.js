@@ -1,5 +1,5 @@
 const { join } = require('path')
-const { https } = require('firebase-functions')
+const functions = require('firebase-functions')
 const { default: next } = require('next')
 
 const nextjsDistDir = join('src', require('./src/next.config.js').distDir)
@@ -14,15 +14,21 @@ const nextjsHandle = nextjsServer.getRequestHandler()
 
 const puppeteer = require('puppeteer')
 
-exports.nextjsFunc = https.onRequest((req, res) => {
+exports.nextjsFunc = functions.https.onRequest((req, res) => {
   return nextjsServer.prepare().then(() => nextjsHandle(req, res))
 })
 
-exports.getProduct = https.onRequest(async (req, res) => {
+const runtimeOpts = {
+  timeoutSeconds: 60,
+  memory: '512MB',
+}
+exports.getProduct = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
   const PRODUCT_URL = 'https://www.cosme.com/products/detail.php'
   if (!req.query.ids) {
     return res
-      .setHeader('Access-Control-Allow-Origin', 'http://localhost:5000')
+      .set('Access-Control-Allow-Headers', '*')
+      .set('Access-Control-Allow-Origin', '*')
+      .set('Access-Control-Allow-Methods', 'GET')
       .status(400)
       .send({ message: 'idを指定してください' })
       .end()
@@ -73,7 +79,13 @@ exports.getProduct = https.onRequest(async (req, res) => {
   }
 
   await browser.close()
-  return res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5000').status(201).send({ products }).end()
+  return res
+    .set('Access-Control-Allow-Headers', '*')
+    .set('Access-Control-Allow-Origin', '*')
+    .set('Access-Control-Allow-Methods', 'GET')
+    .status(201)
+    .send({ products })
+    .end()
 })
 
 const getText = async (page, xpath) => {

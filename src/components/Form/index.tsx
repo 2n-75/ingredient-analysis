@@ -24,6 +24,9 @@ const Form: FC<Props> = ({ setProducts, setIsFetched }) => {
     })
       .then(result => {
         console.log({ result })
+        if (!result.products) {
+          throw Error(result.message)
+        }
         const products = result.products.map(
           (
             product: {
