@@ -130,7 +130,7 @@ const styles = {
     padding: 8px;
   `,
   highlight: css`
-    color: ${Colors.secondary};
+    color: ${Colors.highlight};
     font-weight: bold;
   `,
 }

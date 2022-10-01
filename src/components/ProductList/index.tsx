@@ -22,10 +22,7 @@ export const ProductList: FC<Props> = ({ products }) => {
   const commonIngredients = useMemo(() => {
     return formattedProducts[0].ingredients.filter(ingredient => formattedProducts[1].ingredients.includes(ingredient))
   }, [formattedProducts])
-  console.log({ 共通要素: commonIngredients })
-  if (products.length === 0) {
-    return <p>商品情報が存在しません</p>
-  }
+
   return (
     <Presentation
       products={formattedProducts}

@@ -19,12 +19,14 @@ exports.nextjsFunc = functions.https.onRequest((req, res) => {
 })
 
 const runtimeOpts = {
-  timeoutSeconds: 60,
+  timeoutSeconds: 300,
   memory: '512MB',
 }
 exports.getProduct = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {
   const PRODUCT_URL = 'https://www.cosme.com/products/detail.php'
-  if (!req.query.ids) {
+  // パラメータバリデーション
+  const id = req.query.id
+  if (!id) {
     return res
       .set('Access-Control-Allow-Headers', '*')
       .set('Access-Control-Allow-Origin', '*')
@@ -33,64 +35,49 @@ exports.getProduct = functions.runWith(runtimeOpts).https.onRequest(async (req, 
       .send({ message: 'idを指定してください' })
       .end()
   }
-  const requestUrls = []
-  req.query.ids.forEach(id => {
-    requestUrls.push(`${PRODUCT_URL}?product_id=${id}`)
-  })
 
+  const selector = {
+    name: '#inr__wrap-info > div.product__wrap-main-info > h1',
+    price: '#inr__wrap-info > dl > dd.mg-bottom-0 > p > span:nth-child(2)',
+    productDetail: '#product-detail > div.contents > div > div > div:nth-child(3) > dl',
+  }
+
+  // ページから商品情報を取得する
   const browser = await puppeteer.launch()
+  const requestUrl = `${PRODUCT_URL}?product_id=${id}`
   const page = await browser.newPage()
-  const products = []
-  const xpath = {
-    name: '//*[@id="inr__wrap-info"]/div[1]/h1',
-    price: '//*[@id="inr__wrap-info"]/dl/dd[1]/p/span[2]',
-    ingredients: '//*[@id="product-detail"]/div[5]/div/div/div[3]/dl/dd[6]',
-  }
+  await page.goto(requestUrl, { waitUntil: 'load', timeout: 0 })
+  const product = await page.evaluate(selector => {
+    // 商品の詳細テーブルの内容
+    const productDetailContents = document.querySelector(selector.productDetail).children
+    const productDetailContentsTexts = Array.from(productDetailContents).map(element => element.innerText)
 
-  // TODO: ここの書き方直す
-  // 1つめ
-  if (requestUrls[0]) {
-    await page.goto(requestUrls[0])
-    const name1 = await getText(page, xpath.name)
-    if (!name1) {
-      return undefined
+    return {
+      name: document.querySelector(selector.name).textContent,
+      price: document.querySelector(selector.price).textContent,
+      // 成分の隣のセルのテキストを返す
+      ingredients: productDetailContentsTexts[productDetailContentsTexts.indexOf('成分') + 1],
     }
-    products.push({
-      price: await getText(page, xpath.price),
-      ingredients: await getText(page, xpath.ingredients),
-      name: name1,
-      url: requestUrls[0],
-    })
-  }
-
-  // 2つめ
-  if (requestUrls[1]) {
-    await page.goto(requestUrls[1])
-    const name2 = await getText(page, xpath.name)
-    if (!name2) {
-      return undefined
-    }
-    products.push({
-      price: await getText(page, xpath.price),
-      ingredients: await getText(page, xpath.ingredients),
-      name: name2,
-      url: requestUrls[1],
-    })
-  }
-
+  }, selector)
   await browser.close()
+
+  if (product.name === null) {
+    return res
+      .set('Access-Control-Allow-Headers', '*')
+      .set('Access-Control-Allow-Origin', '*')
+      .set('Access-Control-Allow-Methods', 'GET')
+      .status(400)
+      .send({ message: '商品情報が存在しません' })
+      .end()
+  }
   return res
     .set('Access-Control-Allow-Headers', '*')
     .set('Access-Control-Allow-Origin', '*')
     .set('Access-Control-Allow-Methods', 'GET')
     .status(201)
-    .send({ products })
+    .send({
+      ...product,
+      url: requestUrl,
+    })
     .end()
 })
-
-const getText = async (page, xpath) => {
-  const elems = await page.$x(xpath)
-  if (elems.length === 0) return ''
-  const jsHandle = await elems[0].getProperty('textContent')
-  return await jsHandle.jsonValue()
-}

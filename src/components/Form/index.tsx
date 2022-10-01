@@ -1,8 +1,8 @@
 import Presentation from './presentation'
-import { Dispatch, FC, SetStateAction } from 'react'
+import { Dispatch, FC, SetStateAction, useState } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { Product } from '../App'
-import { getProduct } from '@/server'
+import { getProducts } from '@/server'
 
 export type FormValue = {
   url1: string
@@ -14,48 +14,39 @@ type Props = {
   setIsFetched: Dispatch<SetStateAction<boolean>>
 }
 const Form: FC<Props> = ({ setProducts, setIsFetched }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const onSubmit: SubmitHandler<FormValue> = async data => {
     if (!data.url1 || !data.url2) {
       return
     }
-
-    await getProduct({
-      params: { ids: formatParams([data.url1, data.url2]) },
-    })
-      .then(result => {
-        console.log({ result })
-        if (!result.products) {
-          throw Error(result.message)
-        }
-        const products = result.products.map(
-          (
-            product: {
-              name: string
-              price: string
-              ingredients: string | null
-              url: string
-            },
-            index: number
-          ) => {
-            return {
-              ...product,
-              id: index,
-            }
+    setIsFetched(false)
+    setProducts([])
+    setIsSubmitting(true)
+    await getProducts({
+      ids: formatParams([data.url1, data.url2]),
+      onSuccess: data => {
+        const products = data.map((product, index) => {
+          return {
+            ...product,
+            id: index,
           }
-        )
+        })
         setProducts(products)
         setIsFetched(true)
-      })
-      .catch(() => {
+        setIsSubmitting(false)
+      },
+      onError: () => {
         setIsFetched(true)
-      })
+        setIsSubmitting(false)
+      },
+    })
   }
 
   const formatParams = (urls: string[]) => {
     return urls.map(url => url.replace('https://www.cosme.com/products/detail.php?product_id=', ''))
   }
 
-  return <Presentation onSubmit={onSubmit} />
+  return <Presentation onSubmit={onSubmit} isSubmitting={isSubmitting} />
 }
 
 export default Form

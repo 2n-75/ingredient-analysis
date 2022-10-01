@@ -26,11 +26,16 @@ export default function Home() {
               <Form setProducts={setProducts} setIsFetched={setIsFetched} />
             </div>
           </section>
-
           {isFetched && (
-            <section className={styles.listWrapper}>
-              <ProductList products={products} />
-            </section>
+            <>
+              {products.length === 0 ? (
+                <p className={styles.text}>商品情報が存在しません</p>
+              ) : (
+                <section className={styles.listWrapper}>
+                  <ProductList products={products} />
+                </section>
+              )}
+            </>
           )}
         </main>
       </>
@@ -62,5 +67,9 @@ const styles = {
     display: flex;
     flex-direction: column;
     gap: 20px;
+  `,
+  text: css`
+    margin-top: 40px;
+    text-align: center;
   `,
 }

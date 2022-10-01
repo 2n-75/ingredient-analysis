@@ -7,13 +7,14 @@ import { Button } from '../Button'
 
 export type Props = {
   onSubmit: SubmitHandler<FormValue>
+  isSubmitting: boolean
 }
 
-const Presentation: FC<Props> = ({ onSubmit }) => {
+const Presentation: FC<Props> = ({ onSubmit, isSubmitting }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty, isValid, isSubmitting },
+    formState: { errors, isDirty, isValid },
   } = useForm<FormValue>({ mode: 'onChange' })
 
   return (
@@ -134,7 +135,7 @@ const styles = {
   errorMessage: css`
     margin-top: 4px;
     font-size: 0.75em;
-    color: ${Colors.warning};
+    color: ${Colors.highlight};
   `,
   checkbox: css`
     width: 20px;
@@ -155,7 +156,7 @@ const styles = {
     top: 50%;
     transform: translate(-50%, -50%);
     position: relative;
-    background: ${Colors.thirdly};
+    background: ${Colors.primary};
     opacity: 1;
     position: relative;
     width: 12px;
@@ -174,7 +175,7 @@ const styles = {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: ${Colors.thirdly};
+      background: ${Colors.primary};
       content: '.';
       position: relative;
       opacity: 0.25;
