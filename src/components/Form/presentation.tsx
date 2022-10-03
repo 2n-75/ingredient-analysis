@@ -176,7 +176,7 @@ const styles = {
       height: 12px;
       border-radius: 50%;
       background: ${Colors.primary};
-      content: '.';
+      content: '';
       position: relative;
       opacity: 0.25;
     }
